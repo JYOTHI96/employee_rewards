@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
 import AppStyles from './AppStyles';
 
 const App = () => {
@@ -7,6 +7,7 @@ const App = () => {
   const [isFeedSelected, setIsFeedSelected] = useState(true);
   const [showRewardList, setShowRewardList] = useState(true)
   const [feedList, setFeedList] = useState([]);
+  const [rewardsList, setRewardList] = useState([]);
   const [to, setTo] = useState("");
   const [amount, setAmout] = useState("");
   const [message, setMessage] = useState("");
@@ -24,17 +25,49 @@ const App = () => {
     { "to": "David", "from": "John Doe", "message": "Big Thanks For your help", "time": '4hrs back' },
     { "to": "David", "from": "John Doe", "message": "Big Thanks For your help", "time": '4hrs back' }]
     setFeedList(tempArray)
+   // setRewardList(tempArray)
   }, [])
+
+ const updateRewards = () => {
+  let tempArrObj = {"to":to,"from":"John Doe","message":message,"time":""}
+  setFeedList([tempArrObj, ...feedList])
+  setShowRewardList(!showRewardList)
+  setTo("")
+  setAmout("")
+  setMessage("") 
+
+ }
+
+ const validationOfFeed = () => {
+    if(!to.trim()){
+      alert("Please Enter the Employee Name")
+    }
+    else if(to.length <3){
+      alert("Name should contain minimum 3 characters")
+    }
+    else if(!amount.trim()){
+      alert("Please Enter the Amount")
+    }
+    else if(!message.trim()){
+      alert("Please Enter the Message")
+    }
+    else if(message.length<5){
+      alert("Message should contain atleast 5 characters ")
+    }
+    else{
+      updateRewards()
+    }
+ }
 
   const render_feeds = (data) => {
     return (
-      <View style={{ width: "100%", flexDirection: 'row', alignItems: 'center' }}>
+      <View style={[AppStyles.renderFeedsView]}>
         <Image
           resizeMode='center'
           style={{ height: "100%", width: "15%" }}
           source={require("./assets/images/user.png")}
         />
-        <View style={{ width: "85%", marginLeft: '5%', marginTop: "5%" }}>
+        <View style={AppStyles.feedItemView}>
           <Text style={{ color: "black", fontSize: 15, fontWeight: "600", width: "95%" }}>{data.item.message}</Text>
           <Text style={{ marginTop: "3%", width: "95%" }}>{data.item.to} rewared by {data.item.from}</Text>
           <Text>{data.item.time}</Text>
@@ -46,7 +79,7 @@ const App = () => {
   const showFeed = () => {
     return (
       <View>
-        <View style={{ height: "10%", backgroundColor: "white", width: "100%", borderTopLeftRadius: 25, borderTopRightRadius: 25, flexDirection: 'row' }}>
+        <View style={AppStyles.showFeedView}>
           <TouchableOpacity
             onPress={() => setIsFeedSelected(true)}
             style={{
@@ -75,11 +108,13 @@ const App = () => {
           </TouchableOpacity>
         </View>
         {(feedList.length != 0) ?
+        <View style={{marginBottom:60}}>
           <FlatList
             data={feedList}
             renderItem={(item) => render_feeds(item)}
             keyExtractor={(item, index) => index.toString()}
-          /> : <View />
+          />
+          </View> : <View />
         }
       </View>
     )
@@ -126,6 +161,7 @@ const App = () => {
           }}
           maxLength={20}
           onChangeText={(text)=>setAmout(text)}
+          keyboardType={'number-pad'}
         />
         <Text style={{ color: '#9A846E', marginTop:'10%' }}>Message</Text>
         <TextInput
@@ -135,11 +171,30 @@ const App = () => {
             width:"95%",
             borderWidth:2,
             borderColor:"#9A846E", 
-            color:"white"
+            color:"white",
           }}
           multiline={true}
           onChangeText={(text)=>setMessage(text)}
         />
+
+      <TouchableOpacity
+            onPress={() =>  validationOfFeed()}
+            style={{
+              width: "75%",
+              justifyContent: "center",
+              alignItems: 'center',
+              backgroundColor: "white",
+              borderRadius:20,
+              height:"10%",
+              alignSelf:'center',
+              marginTop:20
+            }}>
+            <Text style={{
+              color:"black"
+            }}>Give</Text>
+          </TouchableOpacity>
+
+
         </View>
       </View>
     )
@@ -147,7 +202,7 @@ const App = () => {
 
   return (
     <SafeAreaView style={AppStyles.container}>
-      <View style={{ height: "25%", width: "100%", alignItems: 'center', flexDirection: "row" }}>
+      <View style={AppStyles.giveRewardView}>
         <Image
           resizeMode='center'
           style={{ height: '35%', width: '25%' }}
@@ -165,18 +220,18 @@ const App = () => {
       <TouchableOpacity
         onPress={() => setShowRewardList(!showRewardList)}
         style={{
-          height: 70,
-          width: 70,
-          borderRadius: 35,
+          height: 40,
+          width: 60,
+          borderRadius: 25,
           backgroundColor: "black",
           position: 'absolute',
-          top: "85%",
-          left: "75%",
+          top: "93%",
+          left: "80%",
           justifyContent: 'center',
           alignItems: 'center'
         }}>
         <Image
-          style={{ height: '60%', width: '60%', tintColor: showRewardList ? "white" : '"black' }}
+          style={{ height: '50%', width: '50%', tintColor: showRewardList ? "white" : '"black' }}
           source={showRewardList ? require("./assets/images/plus.png") : require("./assets/images/x.png")}
         />
       </TouchableOpacity>
